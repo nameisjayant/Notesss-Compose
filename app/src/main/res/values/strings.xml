@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Note App Compose</string>
+    <string name="enter_title">Enter title</string>
+    <string name="save">Save</string>
+</resources>
