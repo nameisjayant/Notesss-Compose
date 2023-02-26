@@ -37,6 +37,8 @@ import com.nameisjayant.noteappcompose.features.ui.viewmodel.NoteViewModel
 import com.nameisjayant.noteappcompose.ui.theme.Background
 import com.nameisjayant.noteappcompose.ui.theme.ContentColor
 import com.nameisjayant.noteappcompose.ui.theme.Red
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -44,7 +46,7 @@ import kotlin.random.Random
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun NoteScreen(
-    viewModel:NoteViewModel = hiltViewModel()
+    viewModel: NoteViewModel = hiltViewModel()
 ) {
 
     var isShow by remember { mutableStateOf(false) }
@@ -66,34 +68,53 @@ fun NoteScreen(
         ) {
             AppSearchView(
                 search = search, onValueChange = { search = it },
-                modifier = Modifier.padding(start = 20.dp ,top = 40.dp, end = 20.dp, bottom = 10.dp)
+                modifier = Modifier.padding(start = 20.dp, top = 40.dp, end = 20.dp, bottom = 10.dp)
             )
 
-            if(response.data.isNotEmpty())
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(20.dp),
-            ) {
-               items(response.data,key = {it.id}){
-                   NoteEachRow(note = it, height = Random.nextInt(150,300).dp)
-               }
-            }
+            if (response.data.isNotEmpty())
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(20.dp),
+                ) {
+                    val filterList: List<NoteResponse> = if (search.isEmpty()) {
+                        response.data
+                    } else {
+                        val result: ArrayList<NoteResponse> = arrayListOf()
+                        for (temp in response.data) {
+                            if (temp.title.lowercase(Locale.getDefault()).contains(
+                                    search.lowercase(
+                                        Locale.getDefault()
+                                    )
+                                ) || temp.description.lowercase(Locale.getDefault()).contains(
+                                    search.lowercase(Locale.getDefault())
+                                )
+                            ) {
+                                result.add(temp)
+                            }
+                        }
+                        result
+                    }
+
+                    items(filterList, key = { it.id }) {
+                        NoteEachRow(note = it, height = Random.nextInt(150, 300).dp)
+                    }
+                }
 
 
-            if(response.isLoading)
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center){
+            if (response.isLoading)
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
                     CircularProgressIndicator(color = Red)
                 }
 
-            if(response.error.isNotEmpty())
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center){
+            if (response.error.isNotEmpty())
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
                     Text(text = response.error)
                 }
-            
+
         }
 
 
@@ -148,7 +169,7 @@ fun AppAlertDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Center
             ) {
                 Button(
                     onClick = {
@@ -160,7 +181,7 @@ fun AppAlertDialog(
                         contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(vertical = 10.dp)
+                    contentPadding = PaddingValues(vertical = 15.dp)
                 ) { Text(text = stringResource(R.string.save)) }
             }
         },
@@ -230,7 +251,7 @@ fun NoteEachRow(
             Text(
                 text = note.description, style = TextStyle(
                     color = Color.Black.copy(alpha = 0.6f),
-                    fontSize = 18.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Normal
                 )
             )
@@ -238,7 +259,7 @@ fun NoteEachRow(
             Text(
                 text = note.updated_at.split("T")[0], style = TextStyle(
                     color = Color.Black.copy(alpha = 0.3f),
-                    fontSize = 14.sp,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.Normal
                 )
             )
@@ -275,16 +296,23 @@ fun AppSearchView(
                     )
                 )
             },
-            leadingIcon = { Icon(imageVector = Icons.Outlined.Search, contentDescription = "",
-                tint = Red
-            )},
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Search, contentDescription = "",
+                    tint = Red
+                )
+            },
             trailingIcon = {
-               if(search.isNotEmpty())
-                   IconButton(onClick = {
-                       onValueChange("")
-                   }) {
-                       Icon(imageVector = Icons.Outlined.Close, contentDescription = "", tint = Red)
-                   }
+                if (search.isNotEmpty())
+                    IconButton(onClick = {
+                        onValueChange("")
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "",
+                            tint = Red
+                        )
+                    }
             }
         )
 
