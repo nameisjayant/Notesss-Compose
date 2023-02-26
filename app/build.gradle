@@ -66,6 +66,7 @@ dependencies {
     //dagger hilt
     implementation("com.google.dagger:hilt-android:$daggerHilt")
     kapt("com.google.dagger:hilt-android-compiler:$daggerHilt")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
 
     //coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine")

@@ -2,6 +2,7 @@ package com.nameisjayant.noteappcompose.features.ui.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -16,18 +17,22 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nameisjayant.noteappcompose.R
 import com.nameisjayant.noteappcompose.data.model.NoteResponse
+import com.nameisjayant.noteappcompose.features.ui.viewmodel.NoteViewModel
 import com.nameisjayant.noteappcompose.ui.theme.Background
 import com.nameisjayant.noteappcompose.ui.theme.ContentColor
 import com.nameisjayant.noteappcompose.ui.theme.Red
@@ -37,10 +42,13 @@ import kotlin.random.Random
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun NoteScreen() {
+fun NoteScreen(
+    viewModel:NoteViewModel = hiltViewModel()
+) {
 
     var isShow by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf("") }
+    val response = viewModel.noteResponseEvent.value
 
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = {
@@ -60,6 +68,7 @@ fun NoteScreen() {
                 modifier = Modifier.padding(start = 20.dp ,top = 40.dp, end = 20.dp, bottom = 10.dp)
             )
 
+            if(response.data.isNotEmpty())
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
                 modifier = Modifier
@@ -74,11 +83,29 @@ fun NoteScreen() {
                             1,
                             "Kotlin",
                             description = "Let's start Kotlin",
-                            created_at = "26 Feb 2023"
+                            created_at = "26 Feb 2023",
+                            updated_at = ""
                         ), height = Random.nextInt(150, 300).dp
                     )
                 }
             }
+            else
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center){
+                    Image(painter = painterResource(id = R.drawable.not_found), contentDescription = "",
+                        modifier = Modifier.size(300.dp)
+                    )
+                }
+
+            if(response.isLoading)
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center){
+                    CircularProgressIndicator(color = Red)
+                }
+
+            if(response.error.isNotEmpty())
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center){
+                    Text(text = "${response.error}")
+                }
+            
         }
 
 
