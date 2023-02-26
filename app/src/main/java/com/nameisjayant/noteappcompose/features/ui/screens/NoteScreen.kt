@@ -1,11 +1,9 @@
 package com.nameisjayant.noteappcompose.features.ui.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,7 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nameisjayant.noteappcompose.R
-import com.nameisjayant.noteappcompose.data.model.Note
+import com.nameisjayant.noteappcompose.data.model.NoteResponse
 import com.nameisjayant.noteappcompose.ui.theme.Background
 import com.nameisjayant.noteappcompose.ui.theme.ContentColor
 import com.nameisjayant.noteappcompose.ui.theme.Red
@@ -72,11 +70,11 @@ fun NoteScreen() {
             ) {
                 items(10) {
                     NoteEachRow(
-                        note = Note(
+                        note = NoteResponse(
                             1,
                             "Kotlin",
                             description = "Let's start Kotlin",
-                            date = "26 Feb 2023"
+                            created_at = "26 Feb 2023"
                         ), height = Random.nextInt(150, 300).dp
                     )
                 }
@@ -182,7 +180,7 @@ fun AppTextField(
 
 @Composable
 fun NoteEachRow(
-    note: Note,
+    note: NoteResponse,
     height: Dp
 ) {
 
@@ -223,7 +221,7 @@ fun NoteEachRow(
             )
             Spacer(modifier = Modifier.height(5.dp))
             Text(
-                text = note.date, style = TextStyle(
+                text = note.created_at, style = TextStyle(
                     color = Color.Black.copy(alpha = 0.3f),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal
