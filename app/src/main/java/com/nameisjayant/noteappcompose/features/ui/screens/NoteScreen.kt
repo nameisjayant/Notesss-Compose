@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -77,24 +78,11 @@ fun NoteScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(20.dp),
             ) {
-                items(10) {
-                    NoteEachRow(
-                        note = NoteResponse(
-                            1,
-                            "Kotlin",
-                            description = "Let's start Kotlin",
-                            created_at = "26 Feb 2023",
-                            updated_at = ""
-                        ), height = Random.nextInt(150, 300).dp
-                    )
-                }
+               items(response.data,key = {it.id}){
+                   NoteEachRow(note = it, height = Random.nextInt(150,300).dp)
+               }
             }
-            else
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center){
-                    Image(painter = painterResource(id = R.drawable.not_found), contentDescription = "",
-                        modifier = Modifier.size(300.dp)
-                    )
-                }
+
 
             if(response.isLoading)
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center){
@@ -103,7 +91,7 @@ fun NoteScreen(
 
             if(response.error.isNotEmpty())
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center){
-                    Text(text = "${response.error}")
+                    Text(text = response.error)
                 }
             
         }
@@ -248,7 +236,7 @@ fun NoteEachRow(
             )
             Spacer(modifier = Modifier.height(5.dp))
             Text(
-                text = note.created_at, style = TextStyle(
+                text = note.updated_at.split("T")[0], style = TextStyle(
                     color = Color.Black.copy(alpha = 0.3f),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal

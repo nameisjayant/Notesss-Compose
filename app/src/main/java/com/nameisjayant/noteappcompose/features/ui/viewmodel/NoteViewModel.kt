@@ -1,5 +1,6 @@
 package com.nameisjayant.noteappcompose.features.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -42,10 +43,12 @@ class NoteViewModel @Inject constructor(
                         isLoading = true
                     )
                 }.catch {
+                    Log.d("main hey12", "${it.message}")
                     _noteResponseEvent.value = NoteState(
                         error = it.message ?: "Something went wrong"
                     )
                 }.collect {
+                    Log.d("main hey", "$it")
                     _noteResponseEvent.value = NoteState(
                         data = it
                     )
