@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -30,13 +31,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nameisjayant.noteappcompose.R
 import com.nameisjayant.noteappcompose.data.model.NoteResponse
 import com.nameisjayant.noteappcompose.features.ui.viewmodel.NoteViewModel
+import com.nameisjayant.noteappcompose.features.ui.viewmodel.events.NoteEvents
+import com.nameisjayant.noteappcompose.features.ui.viewmodel.events.NoteUiEvents
 import com.nameisjayant.noteappcompose.ui.theme.Background
 import com.nameisjayant.noteappcompose.ui.theme.ContentColor
 import com.nameisjayant.noteappcompose.ui.theme.Red
+import com.nameisjayant.noteappcompose.utils.showToast
+import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -52,6 +58,28 @@ fun NoteScreen(
     var isShow by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf("") }
     val response = viewModel.noteResponseEvent.value
+    var isLoading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    if(isLoading)
+        LoadingBar()
+
+    LaunchedEffect(key1 = true ){
+        viewModel.deleteNoteEvent.collectLatest {
+            isLoading = when(it){
+                is NoteUiEvents.Success -> {
+                    context.showToast("Note Deleted")
+                    false
+                }
+                is NoteUiEvents.Failure -> {
+                    context.showToast(it.msg)
+                    false
+                }
+                NoteUiEvents.Loading -> true
+
+            }
+        }
+    }
 
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = {
@@ -100,7 +128,9 @@ fun NoteScreen(
                     }
 
                     items(filterList, key = { it.id }) {
-                        NoteEachRow(note = it, height = Random.nextInt(150, 300).dp)
+                        NoteEachRow(note = it, height = Random.nextInt(150, 300).dp){
+                            viewModel.onEvent(NoteEvents.DeleteNoteEvent(it.id))
+                        }
                     }
                 }
 
@@ -217,7 +247,8 @@ fun AppTextField(
 @Composable
 fun NoteEachRow(
     note: NoteResponse,
-    height: Dp
+    height: Dp,
+    onDelete:()->Unit
 ) {
 
     Box(
@@ -242,7 +273,7 @@ fun NoteEachRow(
                         .align(CenterVertically)
                 )
                 IconButton(onClick = {
-
+                                     onDelete()
                 }, modifier = Modifier.weight(0.3f)) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "", tint = Red)
                 }
@@ -318,4 +349,11 @@ fun AppSearchView(
 
     }
 
+}
+
+@Composable
+fun LoadingBar() {
+    Dialog(onDismissRequest = {}) {
+        CircularProgressIndicator(color = Red)
+    }
 }

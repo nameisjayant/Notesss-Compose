@@ -23,20 +23,20 @@ class ApiService @Inject constructor(
     @OptIn(InternalAPI::class)
     suspend fun addNote(note: Note): NoteResponse {
         return httpClient.post {
-            url("$baseUrl/todo/")
+            url(baseUrl)
             body = note
         }.body()
     }
 
     suspend fun deleteNote(id: Int): NoteResponse {
         return httpClient.delete {
-            url("$baseUrl/todo/$id")
+            url("$baseUrl/$id/")
         }.body()
     }
 
     suspend fun updateNote(id: Int): NoteResponse {
         return httpClient.put {
-            url("$baseUrl/todo/$id")
+            url("$baseUrl/$id")
         }.body()
     }
 
