@@ -8,6 +8,7 @@ sealed class NoteEvents {
     data class AddNoteEvent(val data: Note) : NoteEvents()
     data class DeleteNoteEvent(val id: Int) : NoteEvents()
     data class UpdateNoteEvent(val id: Int) : NoteEvents()
+  object ShowNotes : NoteEvents()
 
 }
 

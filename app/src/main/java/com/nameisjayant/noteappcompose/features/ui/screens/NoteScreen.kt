@@ -1,6 +1,7 @@
 package com.nameisjayant.noteappcompose.features.ui.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nameisjayant.noteappcompose.R
+import com.nameisjayant.noteappcompose.data.model.Note
 import com.nameisjayant.noteappcompose.data.model.NoteResponse
 import com.nameisjayant.noteappcompose.features.ui.viewmodel.NoteViewModel
 import com.nameisjayant.noteappcompose.features.ui.viewmodel.events.NoteEvents
@@ -60,15 +62,21 @@ fun NoteScreen(
     val response = viewModel.noteResponseEvent.value
     var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var title by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
 
-    if(isLoading)
-        LoadingBar()
 
-    LaunchedEffect(key1 = true ){
+    if (isLoading) LoadingBar()
+    LaunchedEffect(key1 = true){
+        viewModel.onEvent(NoteEvents.ShowNotes)
+    }
+
+    LaunchedEffect(key1 = true) {
         viewModel.deleteNoteEvent.collectLatest {
-            isLoading = when(it){
+            isLoading = when (it) {
                 is NoteUiEvents.Success -> {
                     context.showToast("Note Deleted")
+                    viewModel.onEvent(NoteEvents.ShowNotes)
                     false
                 }
                 is NoteUiEvents.Failure -> {
@@ -77,6 +85,23 @@ fun NoteScreen(
                 }
                 NoteUiEvents.Loading -> true
 
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.addNoteEvent.collectLatest {
+            isLoading = when (it) {
+                is NoteUiEvents.Success -> {
+                    context.showToast("Note Added")
+                    false
+                }
+                is NoteUiEvents.Failure -> {
+                    Log.d("main", "NoteScreen:${it.msg} ")
+                    context.showToast(it.msg)
+                    false
+                }
+                NoteUiEvents.Loading -> true
             }
         }
     }
@@ -95,75 +120,89 @@ fun NoteScreen(
                 .background(Background)
         ) {
             AppSearchView(
-                search = search, onValueChange = { search = it },
+                search = search,
+                onValueChange = { search = it },
                 modifier = Modifier.padding(start = 20.dp, top = 40.dp, end = 20.dp, bottom = 10.dp)
             )
 
-            if (response.data.isNotEmpty())
-                LazyVerticalStaggeredGrid(
-                    columns = StaggeredGridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(20.dp),
-                ) {
-                    val filterList: List<NoteResponse> = if (search.isEmpty()) {
-                        response.data
-                    } else {
-                        val result: ArrayList<NoteResponse> = arrayListOf()
-                        for (temp in response.data) {
-                            if (temp.title.lowercase(Locale.getDefault()).contains(
-                                    search.lowercase(
-                                        Locale.getDefault()
-                                    )
-                                ) || temp.description.lowercase(Locale.getDefault()).contains(
-                                    search.lowercase(Locale.getDefault())
+            if (response.data.isNotEmpty()) LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(20.dp),
+            ) {
+                val filterList: List<NoteResponse> = if (search.isEmpty()) {
+                    response.data
+                } else {
+                    val result: ArrayList<NoteResponse> = arrayListOf()
+                    for (temp in response.data) {
+                        if (temp.title.lowercase(Locale.getDefault()).contains(
+                                search.lowercase(
+                                    Locale.getDefault()
                                 )
-                            ) {
-                                result.add(temp)
-                            }
-                        }
-                        result
-                    }
-
-                    items(filterList, key = { it.id }) {
-                        NoteEachRow(note = it, height = Random.nextInt(150, 300).dp){
-                            viewModel.onEvent(NoteEvents.DeleteNoteEvent(it.id))
+                            ) || temp.description.lowercase(Locale.getDefault()).contains(
+                                search.lowercase(Locale.getDefault())
+                            )
+                        ) {
+                            result.add(temp)
                         }
                     }
+                    result
                 }
 
-
-            if (response.isLoading)
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
-                    CircularProgressIndicator(color = Red)
+                items(filterList, key = { it.id }) {
+                    NoteEachRow(note = it, height = Random.nextInt(150, 300).dp) {
+                        viewModel.onEvent(NoteEvents.DeleteNoteEvent(it.id))
+                    }
                 }
+            }
 
-            if (response.error.isNotEmpty())
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
-                    Text(text = response.error)
-                }
+
+            if (response.isLoading) Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Center
+            ) {
+                CircularProgressIndicator(color = Red)
+            }
+
+            if (response.error.isNotEmpty()) Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Center
+            ) {
+                Text(text = response.error)
+            }
 
         }
 
 
     }
 
-    if (isShow)
-        AppAlertDialog {
-            isShow = it
+    if (isShow) AppAlertDialog(title, description, { title = it }, { description = it }, {
+        isShow = it
+    }) {
+        if (title.isNotEmpty() && description.isNotEmpty()) {
+            viewModel.onEvent(
+                NoteEvents.AddNoteEvent(
+                    Note(title, description)
+                )
+            )
+        } else {
+            context.showToast(context.getString(R.string.add_title_and_description))
         }
+    }
 
 }
 
 @Composable
 fun AppAlertDialog(
-    onShowValue: (Boolean) -> Unit
+    title: String,
+    description: String,
+    onTitleChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onShowValue: (Boolean) -> Unit,
+    onClick: () -> Unit = {}
 ) {
-
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = {},
@@ -181,7 +220,7 @@ fun AppAlertDialog(
         text = {
             Column {
                 AppTextField(text = title, placeholder = stringResource(R.string.enter_title)) {
-                    title = it
+                    onTitleChange(it)
                 }
                 Spacer(modifier = Modifier.height(15.dp))
                 AppTextField(
@@ -189,7 +228,7 @@ fun AppAlertDialog(
                     placeholder = "Enter description",
                     modifier = Modifier.height(300.dp)
                 ) {
-                    description = it
+                    onDescriptionChange(it)
                 }
             }
         },
@@ -198,20 +237,19 @@ fun AppAlertDialog(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
-                contentAlignment = Center
+                    .padding(20.dp), contentAlignment = Center
             ) {
                 Button(
                     onClick = {
-                        onShowValue(false)
+                        onClick()
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Red,
-                        contentColor = Color.White
+                        backgroundColor = Red, contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(vertical = 15.dp)
+                    contentPadding = PaddingValues(vertical = 15.dp),
+                    elevation = ButtonDefaults.elevation(0.dp)
                 ) { Text(text = stringResource(R.string.save)) }
             }
         },
@@ -246,9 +284,7 @@ fun AppTextField(
 
 @Composable
 fun NoteEachRow(
-    note: NoteResponse,
-    height: Dp,
-    onDelete:()->Unit
+    note: NoteResponse, height: Dp, onDelete: () -> Unit
 ) {
 
     Box(
@@ -267,13 +303,12 @@ fun NoteEachRow(
                 Text(
                     text = note.title, style = TextStyle(
                         color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.W600
-                    ),
-                    modifier = Modifier
+                    ), modifier = Modifier
                         .weight(0.7f)
                         .align(CenterVertically)
                 )
                 IconButton(onClick = {
-                                     onDelete()
+                    onDelete()
                 }, modifier = Modifier.weight(0.3f)) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "", tint = Red)
                 }
@@ -301,9 +336,7 @@ fun NoteEachRow(
 
 @Composable
 fun AppSearchView(
-    search: String,
-    modifier: Modifier = Modifier,
-    onValueChange: (String) -> Unit
+    search: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit
 ) {
 
     Box(
@@ -312,8 +345,8 @@ fun AppSearchView(
             .clip(RoundedCornerShape(50.dp))
     ) {
 
-        TextField(
-            value = search, onValueChange = onValueChange,
+        TextField(value = search,
+            onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = ContentColor,
@@ -329,23 +362,18 @@ fun AppSearchView(
             },
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Outlined.Search, contentDescription = "",
-                    tint = Red
+                    imageVector = Icons.Outlined.Search, contentDescription = "", tint = Red
                 )
             },
             trailingIcon = {
-                if (search.isNotEmpty())
-                    IconButton(onClick = {
-                        onValueChange("")
-                    }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Close,
-                            contentDescription = "",
-                            tint = Red
-                        )
-                    }
-            }
-        )
+                if (search.isNotEmpty()) IconButton(onClick = {
+                    onValueChange("")
+                }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Close, contentDescription = "", tint = Red
+                    )
+                }
+            })
 
     }
 

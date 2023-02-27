@@ -3,4 +3,5 @@
     <string name="enter_title">Enter title</string>
     <string name="save">Save</string>
     <string name="search_notes">Search Notes..</string>
+    <string name="add_title_and_description">Please add title and description</string>
 </resources>

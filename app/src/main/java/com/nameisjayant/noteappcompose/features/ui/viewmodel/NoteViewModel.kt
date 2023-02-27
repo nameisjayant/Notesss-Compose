@@ -36,24 +36,7 @@ class NoteViewModel @Inject constructor(
 
 
     init {
-        viewModelScope.launch {
-            repository.getNotes()
-                .onStart {
-                    _noteResponseEvent.value = NoteState(
-                        isLoading = true
-                    )
-                }.catch {
-                    Log.d("main hey12", "${it.message}")
-                    _noteResponseEvent.value = NoteState(
-                        error = it.message ?: "Something went wrong"
-                    )
-                }.collect {
-                    Log.d("main hey", "$it")
-                    _noteResponseEvent.value = NoteState(
-                        data = it
-                    )
-                }
-        }
+
     }
 
     fun onEvent(events: NoteEvents) {
@@ -108,6 +91,26 @@ class NoteViewModel @Inject constructor(
                         }.collect {
                             _updateNoteEvent.emit(
                                 NoteUiEvents.Success(it)
+                            )
+                        }
+                }
+            }
+            NoteEvents.ShowNotes -> {
+                viewModelScope.launch {
+                    repository.getNotes()
+                        .onStart {
+                            _noteResponseEvent.value = NoteState(
+                                isLoading = true
+                            )
+                        }.catch {
+                            Log.d("main hey12", "${it.message}")
+                            _noteResponseEvent.value = NoteState(
+                                error = it.message ?: "Something went wrong"
+                            )
+                        }.collect {
+                            Log.d("main hey", "$it")
+                            _noteResponseEvent.value = NoteState(
+                                data = it
                             )
                         }
                 }
