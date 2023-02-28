@@ -79,7 +79,7 @@ class NoteViewModel @Inject constructor(
             }
             is NoteEvents.UpdateNoteEvent -> {
                 viewModelScope.launch {
-                    repository.updateNote(events.id)
+                    repository.updateNote(events.id,events.note)
                         .onStart {
                             _updateNoteEvent.emit(
                                 NoteUiEvents.Loading

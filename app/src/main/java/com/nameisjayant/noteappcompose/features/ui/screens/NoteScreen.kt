@@ -3,8 +3,8 @@ package com.nameisjayant.noteappcompose.features.ui.screens
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -57,13 +56,15 @@ fun NoteScreen(
     viewModel: NoteViewModel = hiltViewModel()
 ) {
 
-    var isShow by remember { mutableStateOf(false) }
+    var noteDialog by remember { mutableStateOf(false) }
+    var updateDialog by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf("") }
     val response = viewModel.noteResponseEvent.value
     var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var noteId by remember { mutableStateOf(0) }
 
 
     if (isLoading) LoadingBar()
@@ -71,12 +72,13 @@ fun NoteScreen(
         viewModel.onEvent(NoteEvents.ShowNotes)
     }
 
-    LaunchedEffect(key1 = true) {
-        viewModel.deleteNoteEvent.collectLatest {
-            isLoading = when (it) {
+    LaunchedEffect(key1 = true){
+        viewModel.updateNoteEvent.collectLatest {
+            isLoading = when(it){
                 is NoteUiEvents.Success -> {
-                    context.showToast("Note Deleted")
+                    context.showToast("Note Updated!")
                     viewModel.onEvent(NoteEvents.ShowNotes)
+                    updateDialog = false
                     false
                 }
                 is NoteUiEvents.Failure -> {
@@ -90,10 +92,31 @@ fun NoteScreen(
     }
 
     LaunchedEffect(key1 = true) {
+        viewModel.deleteNoteEvent.collectLatest {
+            isLoading = when (it) {
+                is NoteUiEvents.Success -> {
+                    context.showToast("Note Deleted")
+                    viewModel.onEvent(NoteEvents.ShowNotes)
+                    false
+                }
+                is NoteUiEvents.Failure -> {
+                    context.showToast(it.msg)
+                    viewModel.onEvent(NoteEvents.ShowNotes)
+                    false
+                }
+                NoteUiEvents.Loading -> true
+
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
         viewModel.addNoteEvent.collectLatest {
             isLoading = when (it) {
                 is NoteUiEvents.Success -> {
                     context.showToast("Note Added")
+                    noteDialog = false
+                    viewModel.onEvent(NoteEvents.ShowNotes)
                     false
                 }
                 is NoteUiEvents.Failure -> {
@@ -108,7 +131,7 @@ fun NoteScreen(
 
     Scaffold(floatingActionButton = {
         FloatingActionButton(onClick = {
-            isShow = true
+            noteDialog = true
         }, backgroundColor = Red) {
             Icon(imageVector = Icons.Default.Add, contentDescription = "", tint = Color.White)
         }
@@ -152,7 +175,14 @@ fun NoteScreen(
                 }
 
                 items(filterList, key = { it.id }) {
-                    NoteEachRow(note = it, height = Random.nextInt(150, 300).dp) {
+                    NoteEachRow(note = it, height = Random.nextInt(150, 300).dp,{
+                        // update api call
+                        title = it.title
+                        description = it.description
+                        updateDialog = true
+                        noteId = it.id
+                    }) {
+                        // delete api call
                         viewModel.onEvent(NoteEvents.DeleteNoteEvent(it.id))
                     }
                 }
@@ -178,8 +208,23 @@ fun NoteScreen(
 
     }
 
-    if (isShow) AppAlertDialog(title, description, { title = it }, { description = it }, {
-        isShow = it
+    if (updateDialog) AppAlertDialog(title, description, { title = it }, { description = it }, {
+        updateDialog = it
+    }) {
+        if (title.isNotEmpty() && description.isNotEmpty()) {
+            viewModel.onEvent(
+                NoteEvents.UpdateNoteEvent(
+                    id = noteId,
+                    Note(title, description)
+                )
+            )
+        } else {
+            context.showToast(context.getString(R.string.add_title_and_description))
+        }
+    }
+
+    if (noteDialog) AppAlertDialog(title, description, { title = it }, { description = it }, {
+        noteDialog = it
     }) {
         if (title.isNotEmpty() && description.isNotEmpty()) {
             viewModel.onEvent(
@@ -284,15 +329,18 @@ fun AppTextField(
 
 @Composable
 fun NoteEachRow(
-    note: NoteResponse, height: Dp, onDelete: () -> Unit
+    note: NoteResponse, height: Dp,
+    onUpdate:()->Unit,
+    onDelete: () -> Unit
 ) {
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(height)
+            //  .height(height)
             .clip(RoundedCornerShape(8.dp))
             .background(ContentColor)
+            .clickable { onUpdate() }
     ) {
         Column(
             modifier = Modifier.padding(15.dp)

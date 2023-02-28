@@ -1,7 +1,7 @@
 package com.nameisjayant.noteappcompose.data.model
 
 import kotlinx.serialization.Serializable
-@Serializable
+//@Serializable
 data class NoteResponse(
     val id: Int,
     val title: String,
@@ -10,7 +10,7 @@ data class NoteResponse(
     val updated_at:String
 )
 
-@Serializable
+//@Serializable
 data class Note(
     val title:String,
     val description: String,

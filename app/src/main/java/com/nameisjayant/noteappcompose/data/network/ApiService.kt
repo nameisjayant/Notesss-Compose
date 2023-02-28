@@ -5,9 +5,12 @@ import com.nameisjayant.noteappcompose.data.model.NoteResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.util.*
 import javax.inject.Inject
 
+
+// api calling with ktor
 class ApiService @Inject constructor(
     private val httpClient: HttpClient
 ) {
@@ -21,10 +24,12 @@ class ApiService @Inject constructor(
     }
 
     @OptIn(InternalAPI::class)
-    suspend fun addNote(note: Note): NoteResponse {
+    suspend fun addNotes(note: Note): NoteResponse {
         return httpClient.post {
+            contentType(ContentType.Application.Json)
             url(baseUrl)
             body = note
+
         }.body()
     }
 
@@ -34,9 +39,12 @@ class ApiService @Inject constructor(
         }.body()
     }
 
-    suspend fun updateNote(id: Int): NoteResponse {
+    @OptIn(InternalAPI::class)
+    suspend fun updateNote(id: Int, note: Note): NoteResponse {
         return httpClient.put {
-            url("$baseUrl/$id")
+            url("$baseUrl/$id/")
+            contentType(ContentType.Application.Json)
+            body = note
         }.body()
     }
 
