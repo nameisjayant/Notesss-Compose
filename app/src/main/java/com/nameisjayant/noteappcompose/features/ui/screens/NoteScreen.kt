@@ -68,6 +68,9 @@ fun NoteScreen(
 
 
     if (isLoading) LoadingBar()
+
+    // these launch effect are to handle the response of add , delete , update and show notes
+
     LaunchedEffect(key1 = true){
         viewModel.onEvent(NoteEvents.ShowNotes)
     }
@@ -142,12 +145,15 @@ fun NoteScreen(
                 .fillMaxSize()
                 .background(Background)
         ) {
+            // search notes here
+
             AppSearchView(
                 search = search,
                 onValueChange = { search = it },
                 modifier = Modifier.padding(start = 20.dp, top = 40.dp, end = 20.dp, bottom = 10.dp)
             )
 
+            // it will show all notes
             if (response.data.isNotEmpty()) LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize(),
@@ -189,6 +195,7 @@ fun NoteScreen(
             }
 
 
+            // loading while fetching all notes from server
             if (response.isLoading) Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Center
@@ -196,6 +203,8 @@ fun NoteScreen(
                 CircularProgressIndicator(color = Red)
             }
 
+
+            // show error
             if (response.error.isNotEmpty()) Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Center
@@ -207,6 +216,8 @@ fun NoteScreen(
 
 
     }
+
+    // open dialog to update notes
 
     if (updateDialog) AppAlertDialog(title, description, { title = it }, { description = it }, {
         updateDialog = it
@@ -222,6 +233,9 @@ fun NoteScreen(
             context.showToast(context.getString(R.string.add_title_and_description))
         }
     }
+
+
+    // open dialog to add notes
 
     if (noteDialog) AppAlertDialog(title, description, { title = it }, { description = it }, {
         noteDialog = it
@@ -239,6 +253,7 @@ fun NoteScreen(
 
 }
 
+// dialog box for add and update notes
 @Composable
 fun AppAlertDialog(
     title: String,
@@ -303,6 +318,7 @@ fun AppAlertDialog(
 
 }
 
+// common text field
 @Composable
 fun AppTextField(
     text: String,
@@ -327,6 +343,7 @@ fun AppTextField(
 
 }
 
+// note layout
 @Composable
 fun NoteEachRow(
     note: NoteResponse, height: Dp,
@@ -382,6 +399,7 @@ fun NoteEachRow(
 
 }
 
+// custom search box
 @Composable
 fun AppSearchView(
     search: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit
@@ -427,6 +445,7 @@ fun AppSearchView(
 
 }
 
+// Loading dialog
 @Composable
 fun LoadingBar() {
     Dialog(onDismissRequest = {}) {
