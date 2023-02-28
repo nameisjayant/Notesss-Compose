@@ -1,7 +1,6 @@
 package com.nameisjayant.noteappcompose.di
 
 import android.util.Log
-import com.nameisjayant.noteappcompose.data.network.ApiService
 import com.nameisjayant.noteappcompose.data.network.RetrofitService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -19,7 +18,6 @@ import io.ktor.client.plugins.observer.*
 import io.ktor.serialization.gson.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -66,7 +64,7 @@ object NetworkModule {
         }
     }
 
-    // retrofit dependencies
+    // retrofit dependencies injection
 
     @Provides
     @Singleton

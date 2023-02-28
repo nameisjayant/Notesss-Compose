@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 
 // api calling with ktor
-class ApiService @Inject constructor(
+class KtorService @Inject constructor(
     private val httpClient: HttpClient
 ) {
 

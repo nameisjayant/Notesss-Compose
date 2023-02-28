@@ -2,7 +2,7 @@ package com.nameisjayant.noteappcompose.data.repository
 
 import com.nameisjayant.noteappcompose.data.model.Note
 import com.nameisjayant.noteappcompose.data.model.NoteResponse
-import com.nameisjayant.noteappcompose.data.network.ApiService
+import com.nameisjayant.noteappcompose.data.network.KtorService
 import com.nameisjayant.noteappcompose.data.network.RetrofitService
 import com.nameisjayant.noteappcompose.features.domain.repository.NoteRepository
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
-    private val apiService: ApiService,
+    private val apiService: KtorService,
     private val retrofitService: RetrofitService
 ) : NoteRepository {
 
