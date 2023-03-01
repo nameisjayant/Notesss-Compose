@@ -4,7 +4,7 @@ A simple note app in jetpack compose , where we can add , delete , update and sh
 
 ### Tech Stack
 
-` Jetpack Compose`
+``` Jetpack Compose```
 `Retrofit and ktor`
 `Dagger Hilt`
 `Coroutines and Flow`
