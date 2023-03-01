@@ -4,12 +4,15 @@ A simple note app in jetpack compose , where we can add , delete , update and sh
 
 ### Tech Stack
 
-``` Jetpack Compose```
+<ul>
+`Jetpack Compose`
 `Retrofit and ktor`
 `Dagger Hilt`
 `Coroutines and Flow`
 `State Flow and Shared Flow`
 `Backend in Django`
+ </ul>
+
 
 <p align="center">
 <img src="screenshot/one.png" height="400">
