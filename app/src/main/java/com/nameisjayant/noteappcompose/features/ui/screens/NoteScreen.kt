@@ -338,7 +338,8 @@ fun AppAlertDialog(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp), contentAlignment = Center
+                    .padding(20.dp),
+                contentAlignment = Center
             ) {
                 Button(
                     onClick = {
@@ -368,8 +369,8 @@ fun AppTextField(
     singleLine: Boolean = false,
     imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
-    onNext:()->Unit = {},
-    onDone:()->Unit = {},
+    onNext: () -> Unit = {},
+    onDone: () -> Unit = {},
     onValueChange: (String) -> Unit
 ) {
 
@@ -387,8 +388,8 @@ fun AppTextField(
         ),
         singleLine = singleLine,
         keyboardActions = KeyboardActions(
-            onDone = {onDone()},
-            onNext = {onNext()}
+            onDone = { onDone() },
+            onNext = { onNext() }
         ),
         keyboardOptions = KeyboardOptions(
             imeAction = imeAction
@@ -408,7 +409,6 @@ fun NoteEachRow(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            //  .height(height)
             .clip(RoundedCornerShape(8.dp))
             .background(ContentColor)
             .clickable { onUpdate() }
@@ -456,46 +456,45 @@ fun NoteEachRow(
 // custom search box
 @Composable
 fun AppSearchView(
-    search: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit
+    search: String,
+    modifier: Modifier = Modifier,
+    onValueChange: (String) -> Unit
 ) {
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-    ) {
 
-        TextField(value = search,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = ContentColor,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            placeholder = {
-                Text(
-                    text = stringResource(R.string.search_notes), style = TextStyle(
-                        color = Color.DarkGray, fontSize = 14.sp, fontWeight = FontWeight.Normal
-                    )
+    TextField(
+        value = search,
+        onValueChange = onValueChange,
+        modifier = modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = ContentColor,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        placeholder = {
+            Text(
+                text = stringResource(R.string.search_notes), style = TextStyle(
+                    color = Color.DarkGray, fontSize = 14.sp, fontWeight = FontWeight.Normal
                 )
-            },
-            leadingIcon = {
+            )
+        },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.Search, contentDescription = "", tint = Red
+            )
+        },
+        trailingIcon = {
+            if (search.isNotEmpty()) IconButton(onClick = {
+                onValueChange("")
+            }) {
                 Icon(
-                    imageVector = Icons.Outlined.Search, contentDescription = "", tint = Red
+                    imageVector = Icons.Outlined.Close, contentDescription = "", tint = Red
                 )
-            },
-            trailingIcon = {
-                if (search.isNotEmpty()) IconButton(onClick = {
-                    onValueChange("")
-                }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Close, contentDescription = "", tint = Red
-                    )
-                }
-            })
+            }
+        },
+        shape = RoundedCornerShape(10.dp)
+    )
 
-    }
 
 }
 

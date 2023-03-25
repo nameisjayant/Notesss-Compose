@@ -35,9 +35,6 @@ class NoteViewModel @Inject constructor(
     val updateNoteEvent = _updateNoteEvent.asSharedFlow()
 
 
-    init {
-
-    }
 
     fun onEvent(events: NoteEvents) {
         when (events) {
@@ -103,12 +100,10 @@ class NoteViewModel @Inject constructor(
                                 isLoading = true
                             )
                         }.catch {
-                            Log.d("main hey12", "${it.message}")
                             _noteResponseEvent.value = NoteState(
                                 error = it.message ?: "Something went wrong"
                             )
                         }.collect {
-                            Log.d("main hey", "$it")
                             _noteResponseEvent.value = NoteState(
                                 data = it
                             )
