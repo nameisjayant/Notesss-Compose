@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -24,13 +26,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -74,13 +83,13 @@ fun NoteScreen(
 
     // these launch effect are to handle the response of add , delete , update and show notes
 
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         viewModel.onEvent(NoteEvents.ShowNotes)
     }
 
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         viewModel.updateNoteEvent.collectLatest {
-            isLoading = when(it){
+            isLoading = when (it) {
                 is NoteUiEvents.Success -> {
                     context.showToast("Note Updated!")
                     viewModel.onEvent(NoteEvents.ShowNotes)
@@ -120,6 +129,8 @@ fun NoteScreen(
         viewModel.addNoteEvent.collectLatest {
             isLoading = when (it) {
                 is NoteUiEvents.Success -> {
+                    title = ""
+                    description = ""
                     context.showToast("Note Added")
                     noteDialog = false
                     viewModel.onEvent(NoteEvents.ShowNotes)
@@ -184,7 +195,7 @@ fun NoteScreen(
                 }
 
                 items(filterList, key = { it.id }) {
-                    NoteEachRow(note = it,{
+                    NoteEachRow(note = it, {
                         // update api call
                         title = it.title
                         description = it.description
@@ -257,6 +268,7 @@ fun NoteScreen(
 }
 
 // dialog box for add and update notes
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AppAlertDialog(
     title: String,
@@ -266,7 +278,12 @@ fun AppAlertDialog(
     onShowValue: (Boolean) -> Unit,
     onClick: () -> Unit = {}
 ) {
-
+    val focusRequester = FocusRequester()
+    val focusManager = LocalFocusManager.current
+    val controller = LocalSoftwareKeyboardController.current
+    LaunchedEffect(key1 = true) {
+        focusRequester.requestFocus()
+    }
     AlertDialog(
         onDismissRequest = {},
         title = {
@@ -282,14 +299,35 @@ fun AppAlertDialog(
         },
         text = {
             Column {
-                AppTextField(text = title, placeholder = stringResource(R.string.enter_title)) {
+                AppTextField(
+                    text = title,
+                    placeholder = stringResource(R.string.enter_title),
+                    singleLine = true,
+                    modifier = Modifier.focusRequester(focusRequester),
+                    imeAction = ImeAction.Next,
+                    keyboardActions = KeyboardActions(onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }),
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                ) {
                     onTitleChange(it)
                 }
+
                 Spacer(modifier = Modifier.height(15.dp))
+
                 AppTextField(
                     text = description,
                     placeholder = "Enter description",
-                    modifier = Modifier.height(300.dp)
+                    modifier = Modifier.height(300.dp),
+                    imeAction = ImeAction.Done,
+                    keyboardActions = KeyboardActions(onDone = {
+                        controller?.hide()
+                    }),
+                    onDone = {
+                        controller?.hide()
+                    }
                 ) {
                     onDescriptionChange(it)
                 }
@@ -327,6 +365,11 @@ fun AppTextField(
     text: String,
     placeholder: String,
     modifier: Modifier = Modifier,
+    singleLine: Boolean = false,
+    imeAction: ImeAction = ImeAction.Default,
+    keyboardActions: KeyboardActions = KeyboardActions(),
+    onNext:()->Unit = {},
+    onDone:()->Unit = {},
     onValueChange: (String) -> Unit
 ) {
 
@@ -341,6 +384,14 @@ fun AppTextField(
             backgroundColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
+        ),
+        singleLine = singleLine,
+        keyboardActions = KeyboardActions(
+            onDone = {onDone()},
+            onNext = {onNext()}
+        ),
+        keyboardOptions = KeyboardOptions(
+            imeAction = imeAction
         )
     )
 
@@ -350,7 +401,7 @@ fun AppTextField(
 @Composable
 fun NoteEachRow(
     note: NoteResponse,
-    onUpdate:()->Unit,
+    onUpdate: () -> Unit,
     onDelete: () -> Unit
 ) {
 
