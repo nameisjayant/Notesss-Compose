@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        compose_ui_version = '1.4.0-beta02'
+        compose_ui_version = '1.4.0'
         daggerHilt = '2.44.2'
         coroutine = '1.6.4'
         ktor_version = '2.2.3'

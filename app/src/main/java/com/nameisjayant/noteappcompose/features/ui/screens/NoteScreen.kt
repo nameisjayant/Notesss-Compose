@@ -6,6 +6,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -103,7 +106,7 @@ fun NoteScreen(
                     false
                 }
                 is NoteUiEvents.Failure -> {
-                    context.showToast(it.msg)
+                    context.showToast("Note Deleted")
                     viewModel.onEvent(NoteEvents.ShowNotes)
                     false
                 }
@@ -150,12 +153,12 @@ fun NoteScreen(
             AppSearchView(
                 search = search,
                 onValueChange = { search = it },
-                modifier = Modifier.padding(start = 20.dp, top = 40.dp, end = 20.dp, bottom = 10.dp)
+                modifier = Modifier.padding(start = 20.dp, top = 50.dp, end = 20.dp)
             )
 
             // it will show all notes
-            if (response.data.isNotEmpty()) LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
+            if (response.data.isNotEmpty()) LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -181,7 +184,7 @@ fun NoteScreen(
                 }
 
                 items(filterList, key = { it.id }) {
-                    NoteEachRow(note = it, height = Random.nextInt(150, 300).dp,{
+                    NoteEachRow(note = it,{
                         // update api call
                         title = it.title
                         description = it.description
@@ -346,7 +349,7 @@ fun AppTextField(
 // note layout
 @Composable
 fun NoteEachRow(
-    note: NoteResponse, height: Dp,
+    note: NoteResponse,
     onUpdate:()->Unit,
     onDelete: () -> Unit
 ) {
@@ -408,7 +411,7 @@ fun AppSearchView(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(50.dp))
+            .clip(RoundedCornerShape(10.dp))
     ) {
 
         TextField(value = search,
