@@ -23,17 +23,20 @@ class NoteViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _noteResponseEvent = mutableStateOf(NoteState())
-    val noteResponseEvent: State<NoteState> = _noteResponseEvent
+    var noteResponseEvent: State<NoteState> = _noteResponseEvent
+        private set
 
     private val _addNoteEvent: MutableSharedFlow<NoteUiEvents> = MutableSharedFlow()
-    val addNoteEvent = _addNoteEvent.asSharedFlow()
+    var addNoteEvent = _addNoteEvent.asSharedFlow()
+        private set
 
     private val _deleteNoteEvent: MutableSharedFlow<NoteUiEvents> = MutableSharedFlow()
-    val deleteNoteEvent = _deleteNoteEvent.asSharedFlow()
+    var deleteNoteEvent = _deleteNoteEvent.asSharedFlow()
+        private set
 
     private val _updateNoteEvent: MutableSharedFlow<NoteUiEvents> = MutableSharedFlow()
-    val updateNoteEvent = _updateNoteEvent.asSharedFlow()
-
+    var updateNoteEvent = _updateNoteEvent.asSharedFlow()
+        private set
 
 
     fun onEvent(events: NoteEvents) {
@@ -76,7 +79,7 @@ class NoteViewModel @Inject constructor(
             }
             is NoteEvents.UpdateNoteEvent -> {
                 viewModelScope.launch {
-                    repository.updateNote(events.id,events.note)
+                    repository.updateNote(events.id, events.note)
                         .onStart {
                             _updateNoteEvent.emit(
                                 NoteUiEvents.Loading
