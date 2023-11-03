@@ -8,7 +8,6 @@ data class NoteResponse(
     val updated_at: String
 )
 
-//@Serializable
 data class Note(
     val title: String,
     val description: String,

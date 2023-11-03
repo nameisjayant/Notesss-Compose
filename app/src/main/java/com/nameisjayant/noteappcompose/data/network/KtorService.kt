@@ -9,7 +9,6 @@ import io.ktor.http.*
 import io.ktor.util.*
 import javax.inject.Inject
 
-
 // api calling with ktor
 class KtorService @Inject constructor(
     private val httpClient: HttpClient

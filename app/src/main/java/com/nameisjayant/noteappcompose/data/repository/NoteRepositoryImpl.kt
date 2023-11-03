@@ -16,7 +16,6 @@ class NoteRepositoryImpl @Inject constructor(
     private val retrofitService: RetrofitService
 ) : NoteRepository {
 
-
     override suspend fun addNote(note: Note): Flow<NoteResponse> = flow {
         emit(retrofitService.addNotes(note))
     }.flowOn(Dispatchers.IO)
@@ -32,6 +31,5 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun updateNote(id: Int, note: Note): Flow<NoteResponse> = flow {
         emit(retrofitService.updateNote(id, note))
     }.flowOn(Dispatchers.IO)
-
 
 }
