@@ -1,6 +1,5 @@
 package com.nameisjayant.noteappcompose.features.ui.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -59,6 +58,7 @@ class NoteViewModel @Inject constructor(
                         }
                 }
             }
+
             is NoteEvents.DeleteNoteEvent -> {
                 viewModelScope.launch {
                     repository.deleteNote(events.id)
@@ -77,6 +77,7 @@ class NoteViewModel @Inject constructor(
                         }
                 }
             }
+
             is NoteEvents.UpdateNoteEvent -> {
                 viewModelScope.launch {
                     repository.updateNote(events.id, events.note)
@@ -95,6 +96,7 @@ class NoteViewModel @Inject constructor(
                         }
                 }
             }
+
             NoteEvents.ShowNotes -> {
                 viewModelScope.launch {
                     repository.getNotes()

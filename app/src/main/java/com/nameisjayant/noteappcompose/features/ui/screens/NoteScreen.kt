@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -57,11 +53,7 @@ import com.nameisjayant.noteappcompose.ui.theme.Red
 import com.nameisjayant.noteappcompose.utils.showToast
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.random.Random
 
-
-@OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun NoteScreen(
@@ -96,10 +88,12 @@ fun NoteScreen(
                     updateDialog = false
                     false
                 }
+
                 is NoteUiEvents.Failure -> {
                     context.showToast(it.msg)
                     false
                 }
+
                 NoteUiEvents.Loading -> true
 
             }
@@ -114,11 +108,13 @@ fun NoteScreen(
                     viewModel.onEvent(NoteEvents.ShowNotes)
                     false
                 }
+
                 is NoteUiEvents.Failure -> {
                     context.showToast("Note Deleted")
                     viewModel.onEvent(NoteEvents.ShowNotes)
                     false
                 }
+
                 NoteUiEvents.Loading -> true
 
             }
@@ -136,11 +132,13 @@ fun NoteScreen(
                     viewModel.onEvent(NoteEvents.ShowNotes)
                     false
                 }
+
                 is NoteUiEvents.Failure -> {
                     Log.d("main", "NoteScreen:${it.msg} ")
                     context.showToast(it.msg)
                     false
                 }
+
                 NoteUiEvents.Loading -> true
             }
         }
@@ -460,7 +458,6 @@ fun AppSearchView(
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit
 ) {
-
 
     TextField(
         value = search,
