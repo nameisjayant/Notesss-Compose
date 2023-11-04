@@ -1,6 +1,6 @@
-# Notesss Compose
+## Notes App Compose
 
-A simple note app in jetpack compose , where we can add , delete , update and show notes through server (Backend made in django).
+A simple note app in Jetpack compose , where we can add , delete , update and show notes through server (Backend made in django).
 
 ### Tech Stack
 
@@ -10,16 +10,3 @@ A simple note app in jetpack compose , where we can add , delete , update and sh
 `Coroutines and Flow`
 `State Flow and Shared Flow`
 `Backend in Django`
-
-
-<p align="center">
-<img src="screenshot/one.png" height="400">
-&nbsp;
-&nbsp;
-&nbsp;
-<img src="screenshot/two.png" height="400">
-</p>
-
-<p align="center">
-<img src="screenshot/three.png" height="400">
-</p>

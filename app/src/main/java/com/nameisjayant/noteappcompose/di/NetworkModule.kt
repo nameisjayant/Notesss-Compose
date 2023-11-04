@@ -77,7 +77,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun providesRetrofitService(moshi: Moshi,client: OkHttpClient): RetrofitService = Retrofit
+    fun providesRetrofitService(moshi: Moshi, client: OkHttpClient): RetrofitService = Retrofit
         .Builder()
         .run {
             baseUrl(RetrofitService.baseUrl)

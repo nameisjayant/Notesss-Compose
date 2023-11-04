@@ -12,6 +12,6 @@ interface NoteRepository {
 
     suspend fun deleteNote(id: Int): Flow<NoteResponse>
 
-    suspend fun updateNote(id: Int,note: Note): Flow<NoteResponse>
+    suspend fun updateNote(id: Int, note: Note): Flow<NoteResponse>
 
 }

@@ -1,13 +1,13 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id "kotlin-kapt"
     id "com.google.dagger.hilt.android"
+    id 'com.google.devtools.ksp' version "1.9.10-1.0.13"
 }
 
 android {
     namespace 'com.nameisjayant.noteappcompose'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.nameisjayant.noteappcompose"
@@ -29,17 +29,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.4'
+        kotlinCompilerExtensionVersion  = "1.5.3"
     }
     packagingOptions {
         resources {
@@ -50,12 +50,20 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.0'
+    def compose_ui_version = '1.5.4'
+    def daggerHilt = '2.47'
+    def coroutine = '1.7.3'
+    def ktor_version = '2.2.3'
+    def retrofit = '2.9.0'
+    def okhttp = '4.10.0'
+    def moshi = '1.13.0'
+
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
+    implementation 'androidx.activity:activity-compose:1.8.0'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
-    implementation 'androidx.compose.material:material:1.4.0'
+    implementation 'androidx.compose.material:material:1.5.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -65,8 +73,8 @@ dependencies {
 
     //dagger hilt
     implementation("com.google.dagger:hilt-android:$daggerHilt")
-    kapt("com.google.dagger:hilt-android-compiler:$daggerHilt")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
+    ksp("com.google.dagger:hilt-android-compiler:$daggerHilt")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     //coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine")
@@ -80,19 +88,17 @@ dependencies {
     implementation("io.ktor:ktor-client-gson:$ktor_version")
     implementation("io.ktor:ktor-serialization-gson:$ktor_version")
 
-
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
+
     //moshi
     implementation "com.squareup.moshi:moshi-kotlin:$moshi"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
-
 
     implementation(platform("com.squareup.okhttp3:okhttp-bom:$okhttp"))
 
     // define any required OkHttp artifacts without version
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
-
 
 }
