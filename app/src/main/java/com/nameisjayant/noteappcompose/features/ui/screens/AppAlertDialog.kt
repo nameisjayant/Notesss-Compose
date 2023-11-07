@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nameisjayant.noteappcompose.R
 import com.nameisjayant.noteappcompose.ui.theme.Background
@@ -125,4 +126,16 @@ fun AppAlertDialog(
         shape = RoundedCornerShape(16.dp),
     )
 
+}
+
+@Preview
+@Composable
+fun AppAlertDialogPreview() {
+    AppAlertDialog(
+        title = "MyNote",
+        description = "Add your notes here",
+        onTitleChange = {},
+        onDescriptionChange = {},
+        onShowValue = {}
+    )
 }
